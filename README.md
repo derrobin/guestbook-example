@@ -1,7 +1,7 @@
 guestbook prototype webapplication with html5 / javascript / jquery / bootstrap and php5 / mysql backend.
 
 install:
-* set db-connection string at class/Guestbook.php::getDb
+* set db-connection string at classes/Guestbook.php::getDb
 * import sql statements from database.sql 
 
 features:
