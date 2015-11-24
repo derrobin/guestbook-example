@@ -6,7 +6,7 @@ class Guestbook {
 	}
 
 	public function add( $entry ) {
-		return $this->doQuery( "INSERT INTO guestbook ( username, email, title, content, createdAt ) VALUES ( '".$entry->username."', '".$entry->email."', '".$entry->title."', '".$entry->content."', '".$entry->date."' )" );
+		return $this->doQuery( "INSERT INTO guestbook ( username, email, title, content, createdAt ) VALUES ( '".mysql_real_escape_string( $entry->username )."', '".mysql_real_escape_string( $entry->email )."', '".mysql_real_escape_string( $entry->title )."', '".mysql_real_escape_string( $entry->content )."', '".$entry->date."' )" );
 	}
 
 	public function getAllEntries() {
