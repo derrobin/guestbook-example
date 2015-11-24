@@ -1,24 +1,8 @@
 <?php
 class Guestbook {
 
-	public function remove( $id ) {
-		$db = $this->getDb();
-		$statement = $db->prepare( "DELETE FROM guestbook WHERE id=?" );
-		$statement->bind_param( "s", $id );
-		return $this->doQuery( $db, $statement );
-	}
-
-	public function add( $entry ) {
-		$db = $this->getDb();
-		$statement = $db->prepare( "INSERT INTO guestbook ( username, email, title, content, createdAt ) VALUES ( ?, ?, ?, ?, ? )" );
-		$statement->bind_param( "sssss",
-			mysql_real_escape_string( $entry->username ),
-			mysql_real_escape_string( $entry->email ),
-			mysql_real_escape_string( $entry->title ),
-			mysql_real_escape_string( $entry->content ),
-			$entry->date
-		);
-		return $this->doQuery( $db, $statement );
+	private function getDb() {
+		return new mysqli( "localhost", "root", "", "guestbook" );
 	}
 
 	public function getAllEntries() {
@@ -32,28 +16,30 @@ class Guestbook {
 		return $data;
 	}
 
-	private function getDb() {
-		return new mysqli( "localhost", "root", "", "guestbook" );
-	}
-
-	private function doQuery( $db, $statement ) {
-		$return = true;
-		//$result = $db->query( $sql );
-		$result = $statement->execute();
-
-		if( $result ) {
-			if( substr( $statement->sqlstate, 0, 6 ) === "INSERT" ) {
-				$return = $result->insert_id;
-			} else {
-				$return = $result;
-			}
-		} else {
-			$return = false;
-		}
-
+	public function add( $entry ) {
+		$db = $this->getDb();
+		$statement = $db->prepare( "INSERT INTO guestbook ( username, email, title, content, createdAt ) VALUES ( ?, ?, ?, ?, ? )" );
+		$statement->bind_param( "sssss",
+			$entry->username,
+			$entry->email,
+			$entry->title,
+			$entry->content,
+			$entry->date
+		);
+		$statement->execute();
+		$insertId = $statement->insert_id;
 		$statement->close();
 		mysqli_close( $db );
-		return $return;
+		return $insertId;
+	}
+
+	public function remove( $id ) {
+		$db = $this->getDb();
+		$statement = $db->prepare( "DELETE FROM guestbook WHERE id=?" );
+		$statement->bind_param( "s", $id );
+		$statement->execute();
+		$statement->close();
+		mysqli_close( $db );
 	}
 
 }

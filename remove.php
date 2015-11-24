@@ -9,5 +9,6 @@ if( empty( $_POST[ 'id' ] ) ) {
 
 $guestbook = new Guestbook();
 $guestbook->remove( $_POST[ 'id' ] );
+echo "SUCCEEDED";
 
 ?>

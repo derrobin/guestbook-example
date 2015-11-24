@@ -9,6 +9,9 @@ $(function() {
                 type: "POST",
                 data: { id: id },                
                 success: function( data ) {
+                    if( data && data.trim() != "SUCCEEDED" ) {
+                        return;
+                    }
                     var el = $( event.currentTarget ).parent().parent().parent().parent();
                     $( el ).fadeOut( 350 );
                     setTimeout( function() { el.remove(); }, 400 );
