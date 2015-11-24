@@ -8,7 +8,7 @@ class Guestbook {
 	public function getAllEntries() {
 		$db = $this->getDb();
 		$records = $db->query( "SELECT * FROM guestbook ORDER BY createdAt DESC" );
-		$data = [];
+		$data = array();
 		while ( $row = $records->fetch_assoc() ) { // instead of $records->fetch_all( MYSQLI_ASSOC ) for downward compatibility to php 5.3.2
 			$data[] = $row; 
 		}
