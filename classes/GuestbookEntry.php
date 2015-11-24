@@ -13,10 +13,10 @@ class GuestbookEntry {
 	public static function createBy( $array ) {
 		$o = new GuestbookEntry();
 		$o->id = isset( $array[ 'id' ] ) ? $array[ 'id' ] : '';
-		$o->username = htmlentities( $array[ 'username' ] );
-		$o->title = htmlentities( $array[ 'title' ] );
-		$o->email = htmlentities( $array[ 'email' ] );
-		$o->content = htmlentities( $array[ 'content' ] );
+		$o->username = strip_tags( $array[ 'username' ] );
+		$o->title = strip_tags( $array[ 'title' ] );
+		$o->email = strip_tags( $array[ 'email' ] );
+		$o->content = strip_tags( $array[ 'content' ] );
 		$o->date = isset( $array ) && isset( $array[ 'createdAt' ] )
 			? $array[ 'createdAt' ]
 			: date( self::$dateFormat );

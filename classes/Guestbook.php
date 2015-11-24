@@ -2,11 +2,23 @@
 class Guestbook {
 
 	public function remove( $id ) {
-		return $this->doQuery( "DELETE FROM guestbook WHERE id=" . $id );
+		$db = $this->getDb();
+		$statement = $db->prepare( "DELETE FROM guestbook WHERE id=?" );
+		$statement->bind_param( "s", $id );
+		return $this->doQuery( $db, $statement );
 	}
 
 	public function add( $entry ) {
-		return $this->doQuery( "INSERT INTO guestbook ( username, email, title, content, createdAt ) VALUES ( '".mysql_real_escape_string( $entry->username )."', '".mysql_real_escape_string( $entry->email )."', '".mysql_real_escape_string( $entry->title )."', '".mysql_real_escape_string( $entry->content )."', '".$entry->date."' )" );
+		$db = $this->getDb();
+		$statement = $db->prepare( "INSERT INTO guestbook ( username, email, title, content, createdAt ) VALUES ( ?, ?, ?, ?, ? )" );
+		$statement->bind_param( "sssss",
+			mysql_real_escape_string( $entry->username ),
+			mysql_real_escape_string( $entry->email ),
+			mysql_real_escape_string( $entry->title ),
+			mysql_real_escape_string( $entry->content ),
+			$entry->date
+		);
+		return $this->doQuery( $db, $statement );
 	}
 
 	public function getAllEntries() {
@@ -16,6 +28,7 @@ class Guestbook {
 		while ( $row = $records->fetch_assoc() ) { // instead of $records->fetch_all( MYSQLI_ASSOC ) for downward compatibility to php 5.3.2
 			$data[] = $row; 
 		}
+		mysqli_close( $db );
 		return $data;
 	}
 
@@ -23,19 +36,22 @@ class Guestbook {
 		return new mysqli( "localhost", "root", "", "guestbook" );
 	}
 
-	private function doQuery( $sql ) {
-		$db = $this->getDb();
+	private function doQuery( $db, $statement ) {
 		$return = true;
-		$result = $db->query( $sql );
+		//$result = $db->query( $sql );
+		$result = $statement->execute();
+
 		if( $result ) {
-			if( substr( $sql, 0, 6 ) === "INSERT" ) {
-				$return = $db->insert_id;
+			if( substr( $statement->sqlstate, 0, 6 ) === "INSERT" ) {
+				$return = $result->insert_id;
 			} else {
 				$return = $result;
 			}
 		} else {
 			$return = false;
 		}
+
+		$statement->close();
 		mysqli_close( $db );
 		return $return;
 	}
